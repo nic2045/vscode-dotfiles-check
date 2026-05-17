@@ -1,8 +1,11 @@
 name: ci
 
 on:
+  # Run on every push to any branch — including branches created by GitHub
+  # Actions (release-please, dependabot grouping). The default `pull_request`
+  # trigger does not fire for PRs created via GITHUB_TOKEN, which would leave
+  # required status checks waiting forever.
   push:
-    branches: [main]
   pull_request:
 
 jobs:
