@@ -13,6 +13,7 @@
     "url": "https://github.com/nic2045/vscode-dotfiles-check/issues"
   },
   "homepage": "https://github.com/nic2045/vscode-dotfiles-check#readme",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.60.0"
   },
@@ -49,12 +50,8 @@
       "properties": {
         "dotfiles-check.allowedOwners": {
           "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            "nic2045"
-          ],
+          "items": { "type": "string" },
+          "default": ["nic2045"],
           "description": "Git remote owners (GitHub user/org names) whose repos the dotfiles check will act on. Other repos are silently ignored."
         }
       }

@@ -4,6 +4,7 @@
 [![Release](https://github.com/nic2045/vscode-dotfiles-check/actions/workflows/release-please.yml/badge.svg)](https://github.com/nic2045/vscode-dotfiles-check/actions/workflows/release-please.yml)
 [![Latest release](https://img.shields.io/github/v/release/nic2045/vscode-dotfiles-check?display_name=tag&sort=semver)](https://github.com/nic2045/vscode-dotfiles-check/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/)
 
 ## Why
 
