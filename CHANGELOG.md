@@ -1,10 +1,15 @@
 # Changelog
 
-## [1.2.5] - 2026-05-17
+## [1.3.0] - 2026-05-17
+
+### Added
+- `ALLOWED_GIT_OWNERS` gate: dotfiles check only runs on git repos whose
+  `remote.origin.url` belongs to an allowed owner (`nic2045`) and only at the
+  repo root. Arbitrary folders and third-party repos are silently ignored.
+- `release-please` workflow for automated versioning and changelog.
 
 ### Changed
-- Limit dotfiles check to git repositories owned by `nic2045` and only at the
-  repo root. Arbitrary folders and third-party repos are silently ignored.
+- README rewritten to describe the extension instead of the dotfiles repo.
 
 ## [1.2.2] - 2026-05-15
 
