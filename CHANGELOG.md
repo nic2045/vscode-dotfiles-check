@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.6.1...v1.6.2) (2026-05-17)
+
+
+### Bug Fixes
+
+* trigger CI on all pushes and fix automerge workflow syntax ([90d8f65](https://github.com/nic2045/vscode-dotfiles-check/commit/90d8f65c57a099cadd3d9b487efa8bf00129ee80))
+
 ## [1.6.1](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.6.0...v1.6.1) (2026-05-17)
 
 
