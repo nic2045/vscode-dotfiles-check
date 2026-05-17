@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.0](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.5.0...v1.6.0) (2026-05-17)
+
+
+### Features
+
+* align with template-1 conventions and add icon ([0430529](https://github.com/nic2045/vscode-dotfiles-check/commit/0430529c399065de3b83280d987c35d76f72fa71))
+* align with template-1 conventions, add icon ([b7432ce](https://github.com/nic2045/vscode-dotfiles-check/commit/b7432ce8534fed7a3f3d6610118b3ea30879def3))
+* self-update extension from git on activation ([08f63c9](https://github.com/nic2045/vscode-dotfiles-check/commit/08f63c9e21740a76506d0e973f341adb6decb216))
+
 ## [1.5.0](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.4.0...v1.5.0) (2026-05-17)
 
 
