@@ -32,7 +32,7 @@ async function getDotfilesPath() {
   return path.join(parentDir, 'dotfiles');
 }
 
-// Returns { isRepo, isRoot, owner, remoteUrl } for the given directory.
+// Returns { isRepo, isRoot, hasCommits, owner, remoteUrl } for the given directory.
 async function inspectGitRepo(projectDir) {
   let toplevel;
   try {
@@ -43,6 +43,18 @@ async function inspectGitRepo(projectDir) {
 
   const isRoot = path.resolve(toplevel) === path.resolve(projectDir);
 
+  // HEAD only resolves once there is at least one commit. A bare `git init`
+  // (no commits yet) should not trigger any dotfiles automation — we don't
+  // want to seed entries in the dotfiles repo for repos the user hasn't
+  // actually started using.
+  let hasCommits = false;
+  try {
+    await git(['rev-parse', '--verify', 'HEAD'], projectDir);
+    hasCommits = true;
+  } catch {
+    // empty repo
+  }
+
   let remoteUrl = '';
   try {
     remoteUrl = await git(['config', '--get', 'remote.origin.url'], projectDir);
@@ -51,7 +63,7 @@ async function inspectGitRepo(projectDir) {
   }
 
   const owner = parseGitOwner(remoteUrl);
-  return { isRepo: true, isRoot, owner, remoteUrl };
+  return { isRepo: true, isRoot, hasCommits, owner, remoteUrl };
 }
 
 // Extract the owner/org from common git remote formats:
@@ -104,6 +116,48 @@ function checkClaudeMd(projectDir, dotfilesPath) {
   }
 
   return { ok: true };
+}
+
+// Commit + push a newly-added project file in the dotfiles repo, so other
+// machines pick it up on next sync. Pulls --rebase first to avoid push
+// rejections when another machine added projects in the meantime.
+async function pushProjectToDotfiles(dotfilesPath, projectName, projectFile) {
+  const relPath = path.relative(dotfilesPath, projectFile);
+  try {
+    log(`Syncing new project '${projectName}' to dotfiles remote...`);
+    updateStatusBar('Pushing to dotfiles...', 'syncing');
+
+    // Stage just the new project file; refuse to drag along unrelated dirty state.
+    await git(['add', '--', relPath], dotfilesPath);
+
+    const staged = await git(['diff', '--cached', '--name-only'], dotfilesPath);
+    if (!staged) {
+      log('Nothing staged — project file already tracked, skipping commit');
+      return;
+    }
+
+    await git(['commit', '-m', `add project: ${projectName}`, '--', relPath], dotfilesPath);
+
+    try {
+      await git(['pull', '--rebase', 'origin', 'main'], dotfilesPath);
+    } catch (err) {
+      log(`Rebase failed (${err.message}) — aborting push to avoid bad state`);
+      try { await git(['rebase', '--abort'], dotfilesPath); } catch {}
+      vscode.window.showWarningMessage(
+        `Dotfiles: could not rebase before push for '${projectName}'. Commit is local; push manually after resolving.`
+      );
+      return;
+    }
+
+    await git(['push', 'origin', 'main'], dotfilesPath);
+    log(`Pushed 'add project: ${projectName}' to dotfiles`);
+    updateStatusBar('Dotfiles pushed', 'synced');
+  } catch (err) {
+    log(`Push to dotfiles failed: ${err.message}`);
+    vscode.window.showWarningMessage(
+      `Dotfiles: auto-push for '${projectName}' failed — ${err.message}. The local symlink is set; push the dotfiles repo manually.`
+    );
+  }
 }
 
 async function syncDotfiles() {
@@ -212,6 +266,13 @@ function activate(context) {
       return;
     }
 
+    if (!repoInfo.hasCommits) {
+      log(`Skipping ${projectDir}: repo has no commits yet (fresh git init)`);
+      updateStatusBar('Empty repo — skipped', 'skipped');
+      statusBar.hide();
+      return;
+    }
+
     // From here on we know it's one of the user's own repos at its root.
     statusBar.show();
 
@@ -259,6 +320,9 @@ function activate(context) {
           try { fs.unlinkSync(claudeCheck.claudeMdPath); } catch {}
           fs.symlinkSync(`../dotfiles/claude/projects/${projectName}.md`, claudeCheck.claudeMdPath);
           log(`CLAUDE.md symlink created for ${projectName}`);
+
+          await pushProjectToDotfiles(dotfilesPath, projectName, claudeCheck.expectedTarget);
+
           const reload = await vscode.window.showInformationMessage(
             `✓ CLAUDE.md set up for "${projectName}". Reload window so Claude reads it?`,
             'Reload Window',
