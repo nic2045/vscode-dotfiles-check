@@ -1,2 +1,4 @@
-# Symlinks created by setup.sh
-CLAUDE.md
+.vscode/
+node_modules/
+*.vsix
+.DS_Store
