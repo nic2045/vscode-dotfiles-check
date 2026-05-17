@@ -7,8 +7,13 @@ let outputChannel;
 let statusBar;
 let syncInterval;
 
-// Only run dotfiles checks for repos owned by this GitHub user / org.
-const ALLOWED_GIT_OWNERS = ['nic2045'];
+// Allowed git remote owners. Read from the `dotfiles-check.allowedOwners`
+// VS Code setting at use-time so users can add work orgs without rebuilding.
+function getAllowedOwners() {
+  const cfg = vscode.workspace.getConfiguration('dotfiles-check');
+  const list = cfg.get('allowedOwners');
+  return Array.isArray(list) && list.length ? list : ['nic2045'];
+}
 
 function log(msg) {
   const timestamp = new Date().toLocaleTimeString();
@@ -198,7 +203,24 @@ async function pushProjectToDotfiles(dotfilesPath, projectName, projectFile) {
       return;
     }
 
-    await git(['push', 'origin', 'main'], dotfilesPath);
+    // Push, with one rebase-and-retry if another machine raced us between
+    // pull and push (non-fast-forward). Logs each step loudly so the race is
+    // visible in the output channel instead of silently swallowed.
+    try {
+      await git(['push', 'origin', 'main'], dotfilesPath);
+    } catch (pushErr) {
+      log(`Push rejected — possible race with another machine: ${pushErr.message}`);
+      log('Retrying once: pull --rebase + push');
+      try {
+        await git(['pull', '--rebase', 'origin', 'main'], dotfilesPath);
+        await git(['push', 'origin', 'main'], dotfilesPath);
+        log('Retry push succeeded');
+      } catch (retryErr) {
+        log(`Retry push failed: ${retryErr.message}`);
+        try { await git(['rebase', '--abort'], dotfilesPath); } catch {}
+        throw new Error(`push rejected twice (race or conflict): ${retryErr.message}`);
+      }
+    }
     log(`Pushed 'add project: ${projectName}' to dotfiles`);
     updateStatusBar('Dotfiles pushed', 'synced');
   } catch (err) {
@@ -308,8 +330,9 @@ function activate(context) {
       return;
     }
 
-    if (!repoInfo.owner || !ALLOWED_GIT_OWNERS.includes(repoInfo.owner)) {
-      log(`Skipping ${projectDir}: remote '${repoInfo.remoteUrl || '<none>'}' is not from an allowed owner (${ALLOWED_GIT_OWNERS.join(', ')})`);
+    const allowedOwners = getAllowedOwners();
+    if (!repoInfo.owner || !allowedOwners.includes(repoInfo.owner)) {
+      log(`Skipping ${projectDir}: remote '${repoInfo.remoteUrl || '<none>'}' is not from an allowed owner (${allowedOwners.join(', ')})`);
       updateStatusBar('External repo — skipped', 'skipped');
       statusBar.hide();
       return;

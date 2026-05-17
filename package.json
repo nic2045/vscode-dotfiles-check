@@ -1,12 +1,30 @@
 {
   "name": "dotfiles-check",
   "displayName": "Dotfiles Check",
-  "description": "Keep dotfiles synced via periodic git pull",
+  "description": "Auto-link CLAUDE.md to your dotfiles repo and keep it synced",
   "version": "1.3.0",
   "publisher": "nico",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nic2045/vscode-dotfiles-check.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nic2045/vscode-dotfiles-check/issues"
+  },
+  "homepage": "https://github.com/nic2045/vscode-dotfiles-check#readme",
   "engines": {
     "vscode": "^1.60.0"
   },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dotfiles",
+    "claude",
+    "claude-code",
+    "git"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -21,6 +39,17 @@
         "command": "dotfiles-check.sync",
         "title": "Dotfiles: Sync Now"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Dotfiles Check",
+      "properties": {
+        "dotfiles-check.allowedOwners": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["nic2045"],
+          "description": "Git remote owners (GitHub user/org names) whose repos the dotfiles check will act on. Other repos are silently ignored."
+        }
+      }
+    }
   }
 }
