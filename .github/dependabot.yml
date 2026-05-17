@@ -7,3 +7,9 @@ updates:
     commit-message:
       prefix: ci
       include: scope
+    # Bundle all action updates into a single weekly PR instead of one PR per
+    # action. Auto-merge then handles them as one batch.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
