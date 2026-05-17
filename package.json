@@ -1,0 +1,26 @@
+{
+  "name": "dotfiles-check",
+  "displayName": "Dotfiles Check",
+  "description": "Keep dotfiles synced via periodic git pull",
+  "version": "1.2.5",
+  "publisher": "nico",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dotfiles-check.verify",
+        "title": "Verify Dotfiles Setup"
+      },
+      {
+        "command": "dotfiles-check.sync",
+        "title": "Dotfiles: Sync Now"
+      }
+    ]
+  }
+}
