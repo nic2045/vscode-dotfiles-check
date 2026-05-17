@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.4.0...v1.5.0) (2026-05-17)
+
+
+### Features
+
+* auto-commit and push new projects to dotfiles ([4167c3d](https://github.com/nic2045/vscode-dotfiles-check/commit/4167c3dbb915690d2d6094aacec03fbbb7c31371))
+* auto-sync new projects to dotfiles repo ([174a806](https://github.com/nic2045/vscode-dotfiles-check/commit/174a80669e75f00bf7d66c74661349f32e5c1514))
+* polish manifest, allowedOwners setting, CI validation ([c6ee55f](https://github.com/nic2045/vscode-dotfiles-check/commit/c6ee55f705588b2b729cf7b855c68081ece19840))
+* polish manifest, expose allowedOwners as setting, add CI ([39fdbc3](https://github.com/nic2045/vscode-dotfiles-check/commit/39fdbc3d0a9e9b598c1499c32f589a6806e05a51))
+* restore extension manifest and add release-please ([ca44392](https://github.com/nic2045/vscode-dotfiles-check/commit/ca44392f8f75e3d06ea5e535c030e5ff0da004dd))
+* silent auto-fix and keep dotfiles refs out of cloned repos ([0477dfa](https://github.com/nic2045/vscode-dotfiles-check/commit/0477dfaf888f1f04f8748ab0998f074060fbf3b2))
+* silent auto-fix and keep dotfiles refs out of cloned repos ([909e7ce](https://github.com/nic2045/vscode-dotfiles-check/commit/909e7ce10a323961b10b7f7b18afb90caf8d022a))
+
 ## [1.4.0](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.3.0...v1.4.0) (2026-05-17)
 
 
