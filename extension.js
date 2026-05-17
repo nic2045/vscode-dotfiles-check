@@ -494,7 +494,8 @@ function activate(context) {
   setTimeout(selfUpdate, 30 * 1000);
   selfUpdateInterval = setInterval(selfUpdate, 6 * 60 * 60 * 1000);
 
-  log('Extension activated — dotfiles + self-update background sync every 6 hours');
+  const version = readExtensionVersion() || 'unknown';
+  log(`Extension activated (v${version}) — dotfiles + self-update background sync every 6 hours`);
 }
 
 function deactivate() {
