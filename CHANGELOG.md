@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.6.0...v1.6.1) (2026-05-17)
+
+
+### Bug Fixes
+
+* log extension version on activation for easier debugging ([deb4189](https://github.com/nic2045/vscode-dotfiles-check/commit/deb4189a1275a083380adf2475a90254957c216f))
+* log extension version on activation for easier debugging ([6462617](https://github.com/nic2045/vscode-dotfiles-check/commit/6462617e67d9b8500dc077b14ea9f66da79f111a))
+
 ## [1.6.0](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.5.0...v1.6.0) (2026-05-17)
 
 
