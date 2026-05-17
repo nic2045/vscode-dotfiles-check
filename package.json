@@ -38,6 +38,10 @@
       {
         "command": "dotfiles-check.sync",
         "title": "Dotfiles: Sync Now"
+      },
+      {
+        "command": "dotfiles-check.update",
+        "title": "Dotfiles Check: Update Extension"
       }
     ],
     "configuration": {

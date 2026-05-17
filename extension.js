@@ -6,6 +6,8 @@ const { execFile } = require('child_process');
 let outputChannel;
 let statusBar;
 let syncInterval;
+let selfUpdateInterval;
+let extensionRoot;
 
 // Allowed git remote owners. Read from the `dotfiles-check.allowedOwners`
 // VS Code setting at use-time so users can add work orgs without rebuilding.
@@ -294,6 +296,65 @@ function updateStatusBar(text, state) {
   }
 }
 
+// Self-update: when this extension is installed as a symlink from a git
+// checkout (which is how install.sh sets it up), pull the latest changes
+// from origin/main so the user gets new versions without ever running
+// `git pull` manually. Skips silently when the extension is packaged
+// (no .git/), when the checkout has uncommitted changes, or on any error.
+async function selfUpdate() {
+  if (!extensionRoot) return;
+
+  const gitDir = path.join(extensionRoot, '.git');
+  if (!fs.existsSync(gitDir)) {
+    return; // packaged install, not a git checkout
+  }
+
+  try {
+    const dirty = await git(['status', '--porcelain'], extensionRoot);
+    if (dirty) {
+      log('Extension self-update skipped: working tree has local changes');
+      return;
+    }
+
+    const currentVersion = readExtensionVersion();
+    await git(['fetch', 'origin', 'main'], extensionRoot);
+    const diff = await git(['diff', 'HEAD', 'origin/main', '--name-only'], extensionRoot);
+    if (!diff) {
+      log('Extension self-update: already up to date');
+      return;
+    }
+
+    log('Extension self-update: pulling new version...');
+    await git(['pull', '--ff-only', 'origin', 'main'], extensionRoot);
+    const newVersion = readExtensionVersion();
+
+    if (newVersion && newVersion !== currentVersion) {
+      log(`Extension updated: ${currentVersion} → ${newVersion}`);
+      const action = await vscode.window.showInformationMessage(
+        `Dotfiles Check updated to v${newVersion}. Reload window to apply?`,
+        'Reload Window',
+        'Later'
+      );
+      if (action === 'Reload Window') {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+      }
+    } else {
+      log('Extension self-update: pulled changes (no version bump)');
+    }
+  } catch (err) {
+    log(`Self-update failed: ${err.message}`);
+  }
+}
+
+function readExtensionVersion() {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(extensionRoot, 'package.json'), 'utf8'));
+    return pkg.version;
+  } catch {
+    return null;
+  }
+}
+
 function activate(context) {
   outputChannel = vscode.window.createOutputChannel('Dotfiles Check');
   statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -411,19 +472,34 @@ function activate(context) {
   });
 
   const syncCmd = vscode.commands.registerCommand('dotfiles-check.sync', syncDotfiles);
+  const updateCmd = vscode.commands.registerCommand('dotfiles-check.update', selfUpdate);
 
-  context.subscriptions.push(verifyCmd, syncCmd, statusBar, outputChannel);
+  // Resolve the real path (extension is symlinked from ~/Coding/...) so git
+  // operations land in the source checkout, not the symlink in .vscode.
+  try {
+    extensionRoot = fs.realpathSync(context.extensionPath);
+  } catch {
+    extensionRoot = context.extensionPath;
+  }
+
+  context.subscriptions.push(verifyCmd, syncCmd, updateCmd, statusBar, outputChannel);
 
   // Initial verify on startup
   vscode.commands.executeCommand('dotfiles-check.verify');
 
-  // Background sync every 6 hours
+  // Background dotfiles sync every 6 hours
   syncInterval = setInterval(syncDotfiles, 6 * 60 * 60 * 1000);
-  log('Extension activated — background sync every 6 hours');
+
+  // Self-update: 30s after activation (let workspace settle), then every 6 hours
+  setTimeout(selfUpdate, 30 * 1000);
+  selfUpdateInterval = setInterval(selfUpdate, 6 * 60 * 60 * 1000);
+
+  log('Extension activated — dotfiles + self-update background sync every 6 hours');
 }
 
 function deactivate() {
   if (syncInterval) clearInterval(syncInterval);
+  if (selfUpdateInterval) clearInterval(selfUpdateInterval);
 }
 
 module.exports = { activate, deactivate };
