@@ -2,7 +2,7 @@
   "name": "dotfiles-check",
   "displayName": "Dotfiles Check",
   "description": "Auto-link CLAUDE.md to your dotfiles repo and keep it synced",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "nico",
   "license": "MIT",
   "repository": {
@@ -45,8 +45,12 @@
       "properties": {
         "dotfiles-check.allowedOwners": {
           "type": "array",
-          "items": { "type": "string" },
-          "default": ["nic2045"],
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "nic2045"
+          ],
           "description": "Git remote owners (GitHub user/org names) whose repos the dotfiles check will act on. Other repos are silently ignored."
         }
       }
