@@ -2,7 +2,7 @@
   "name": "dotfiles-check",
   "displayName": "Dotfiles Check",
   "description": "Auto-link CLAUDE.md to your dotfiles repo and keep it synced",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "publisher": "nico",
   "license": "MIT",
   "repository": {

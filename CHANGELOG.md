@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.6.1...v1.7.0) (2026-05-18)
+
+
+### Features
+
+* add install.ps1 for Windows local extension installation ([bcbdd85](https://github.com/nic2045/vscode-dotfiles-check/commit/bcbdd8511b6af03c1bd21878d9a76b7b15957366))
+
+
+### Bug Fixes
+
+* trigger CI on all pushes and fix automerge workflow syntax ([90d8f65](https://github.com/nic2045/vscode-dotfiles-check/commit/90d8f65c57a099cadd3d9b487efa8bf00129ee80))
+
 ## [1.6.1](https://github.com/nic2045/vscode-dotfiles-check/compare/v1.6.0...v1.6.1) (2026-05-17)
 
 
